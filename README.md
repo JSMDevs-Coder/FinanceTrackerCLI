@@ -46,5 +46,5 @@ Permite agregar productos, ver inventario, y sirve como base para registrar vent
 1. Clona el repositorio:
 
 ```bash
-git clone https://github.com/TU_USUARIO/finance-tracker.git
-cd finance-tracker
+git clone https://github.com/JSMDevs-Coder/FinanceTrackerCLI.git
+cd FinanceTrackerCLI
