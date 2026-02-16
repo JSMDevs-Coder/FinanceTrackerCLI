@@ -2,6 +2,10 @@ from database_connection import *
 from colorama import init, Fore, Style
 import os
 import sys
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from openpyxl.utils import get_column_letter
+from datetime import datetime
 
 init(autoreset=True)
 
@@ -96,7 +100,132 @@ def total():
 
 def create():
     cleanscreen()
-    print ("crear archivo exel")
+
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, nombre, costo, precio, cantidad FROM productos")
+    products = cursor.fetchall()
+
+    if not products:
+        print(Fore.RED + "No products available to export.")
+        conn.close()
+        return
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Financial Report"
+
+    # ====== ESTILOS ======
+    bold_font = Font(bold=True)
+    title_font = Font(size=16, bold=True)
+    header_fill = PatternFill(start_color="DDDDDD", end_color="DDDDDD", fill_type="solid")
+    thin_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+
+    # ====== TÍTULO ======
+    ws.merge_cells("A1:H1")
+    ws["A1"] = "FINANCE TRACKER - INVENTORY REPORT"
+    ws["A1"].font = title_font
+    ws["A1"].alignment = Alignment(horizontal="center")
+
+    ws.merge_cells("A2:H2")
+    ws["A2"] = f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    ws["A2"].alignment = Alignment(horizontal="center")
+
+    ws.append([])
+
+    # ====== ENCABEZADOS ======
+    headers = [
+        "ID", "Product Name", "Cost",
+        "Sale Price", "Stock",
+        "Total Investment", "Potential Revenue",
+        "Potential Profit"
+    ]
+
+    ws.append(headers)
+
+    for col in ws[4]:
+        col.font = bold_font
+        col.fill = header_fill
+        col.border = thin_border
+        col.alignment = Alignment(horizontal="center")
+
+    total_investment = 0
+    total_revenue = 0
+    total_profit = 0
+
+    # ====== DATOS ======
+    for p in products:
+        id_, name, cost, price, quantity = p
+
+        investment = cost * quantity
+        revenue = price * quantity
+        profit = (price - cost) * quantity
+
+        total_investment += investment
+        total_revenue += revenue
+        total_profit += profit
+
+        ws.append([
+            id_, name, cost, price,
+            quantity, investment,
+            revenue, profit
+        ])
+
+    # Aplicar bordes y formato moneda
+    for row in ws.iter_rows(min_row=5, max_row=ws.max_row):
+        for cell in row:
+            cell.border = thin_border
+
+        row[2].number_format = '"$"#,##0.00'
+        row[3].number_format = '"$"#,##0.00'
+        row[5].number_format = '"$"#,##0.00'
+        row[6].number_format = '"$"#,##0.00'
+        row[7].number_format = '"$"#,##0.00'
+
+    # ====== TOTALES ======
+    ws.append([])
+    ws.append([
+        "", "", "", "",
+        "TOTALS:",
+        total_investment,
+        total_revenue,
+        total_profit
+    ])
+
+    total_row_index = ws.max_row
+
+    for cell in ws[total_row_index]:
+        cell.font = bold_font
+        cell.border = thin_border
+
+    ws.cell(row=total_row_index, column=6).number_format = '"$"#,##0.00'
+    ws.cell(row=total_row_index, column=7).number_format = '"$"#,##0.00'
+    ws.cell(row=total_row_index, column=8).number_format = '"$"#,##0.00'
+
+    # ====== AUTOAJUSTE CORREGIDO (SIN MERGEDCELL ERROR) ======
+    for col in range(1, ws.max_column + 1):
+        max_length = 0
+        column_letter = get_column_letter(col)
+
+        for row in range(1, ws.max_row + 1):
+            cell = ws.cell(row=row, column=col)
+            if cell.value:
+                max_length = max(max_length, len(str(cell.value)))
+
+        ws.column_dimensions[column_letter].width = max_length + 2
+
+    filename = f"Financial_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    wb.save(filename)
+
+    conn.close()
+
+    print(Fore.GREEN + f"\nProfessional financial report created: {filename}")
 
 def remove():
     cleanscreen()
