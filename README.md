@@ -1,50 +1,27 @@
-# 💰 Finance Tracker CLI
+# 💼 FinanceTrackerCLI
 
-![Python](https://img.shields.io/badge/python-3.11-blue)
-![SQLite](https://img.shields.io/badge/SQLite-database-orange)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Last Commit](https://img.shields.io/github/last-commit/TU_USUARIO/finance-tracker)
-
-Sistema de finanzas y gestión de productos en **consola**, con persistencia en SQLite.  
-Permite agregar productos, ver inventario, y sirve como base para registrar ventas y calcular ganancias.
+**FinanceTrackerCLI** es una aplicación de línea de comandos desarrollada en **Python** que permite gestionar inventarios y finanzas de manera sencilla y profesional.  
+Registra productos, controla inventarios, calcula ganancias, genera reportes financieros y exporta datos a **Excel**.
 
 ---
 
-## 📸 Demo
+## 🚀 Funcionalidades principales
 
-![Demo Terminal](https://media.giphy.com/media/tuGIFdemo/giphy.gif)
-
-
----
-
-## 🚀 Características principales
-
-- ✅ Agregar productos con nombre, costo, precio y cantidad
-- ✅ Visualizar inventario actualizado
-- ✅ Persistencia de datos con SQLite
-- ✅ Menú interactivo en consola
-- ✅ Mensajes de error en color usando `colorama`
-- 🔜 Futuras mejoras:
-  - Registro de ventas
-  - Cálculo automático de ganancias
-  - Exportación a Excel
-  - Alertas de stock bajo
-  - Dashboard estadístico
+- Agregar productos al inventario (`/add`)
+- Listar todos los productos (`/listproducts`)
+- Eliminar productos (`/remove`)
+- Registrar ventas (`/registersale`)
+- Ver resumen financiero con ganancias y totales (`/total`)
+- Exportar reporte profesional a Excel (`/create`)
+- Ver todos los comandos disponibles (`/help`)
+- Salir del programa (`/exit`)
 
 ---
 
-## 🛠 Tecnologías usadas
+## 📦 Requisitos
 
-- **Python 3.x**
-- **SQLite3**
-- **Colorama** (para mensajes en color)
-
----
-
-## 💻 Cómo ejecutar
-
-1. Clona el repositorio:
+- Python 3.8+  
+- Librerías:
 
 ```bash
-git clone https://github.com/JSMDevs-Coder/FinanceTrackerCLI.git
-cd FinanceTrackerCLI
+pip install colorama openpyxl
